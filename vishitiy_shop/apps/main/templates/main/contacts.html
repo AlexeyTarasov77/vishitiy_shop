@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'main/css/contacts.css' %}">
+{% endblock %}
+
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div class="main-container">
+        <div class="cont-for-inpt">
+            <h3>Контакт</h3>
+            <h6>Ім'я</h6>
+            <input type="text" name="name">
+            <h6>Ваш номер телефону</h6>
+            <input type="number" name="phone_number">
+            <h6>Ваш email</h6>
+            <input type="email" name="email">
+            <h6>Комментар</h6>
+            <textarea name="comment" id="area"></textarea>
+            <button type="submit" class="btn btn-light">Надіслати</button>
+
+            <div class="container-for-links">
+                <h4>Наші соцмережі</h4>
+                <div class="social-net">
+                    <div class="links-on-social">
+                        <a href="https://www.instagram.com/vishitiy.ua?igsh=MXZ4ejM5eDR5MWgwMQ==" target="_blank"> <img src="{% static 'img/instagram.svg' %}" > </a>
+                    </div>
+    
+                    <div class="links-on-social">
+                        <a href="https://www.facebook.com/profile.php?id=100090697746664" target="_blank"> <img src="{% static 'img/facebook.svg' %}" > </a>
+                    </div>
+    
+                    <div class="links-on-social">
+                        <a href="https://www.tiktok.com/@vishitiy.ua?_t=8n8Qs4st9oU&_r=1" target="_blank"> <img src="{% static 'img/tiktok.svg' %}" > </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock %}
