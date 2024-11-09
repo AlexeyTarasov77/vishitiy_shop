@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load crispy_forms_tags %}
 
 {% block links %}
 <link rel="stylesheet" href="{% static 'main/css/contacts.css' %}">
@@ -8,34 +8,43 @@
 
 
 {% block content %}
-<form action="" method="post">
-    {% csrf_token %}
-    <div class="main-container">
-        <div class="cont-for-inpt">
-            <h3>Контакт</h3>
-            <h6>Ім'я</h6>
-            <input type="text" name="name">
-            <h6>Ваш номер телефону</h6>
-            <input type="number" name="phone_number">
-            <h6>Ваш email</h6>
-            <input type="email" name="email">
-            <h6>Комментар</h6>
-            <textarea name="comment" id="area"></textarea>
-            <button type="submit" class="btn btn-light">Надіслати</button>
-
-            <div class="container-for-links">
-                <h4>Наші соцмережі</h4>
-                <div class="social-net">
+    <div class="main-container text-white p-5">
+        <div class="d-flex justify-content-center flex-col">
+            <div class="w-1/3 mx-auto">
+                <h3>Контактувати продавця</h3>
+                <form method="post" class="">
+                    {% csrf_token %}
+                    {% for f in form %}
+                        {% if f.name == "phone_number" %}
+                            <div>
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text" id="basic-addon1">+380</span>
+                                    <input type="tel" name="{{f.name}}" {% if f.required %}required{% endif %} placeholder="{{f.label}}" class="form-control" aria-describedby="basic-addon1" value="{{f.value|default_if_none:""}}">
+                                </div>
+                                {% for err in f.errors %}
+                                    <p class="text-danger">{{err}}</p>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{f|as_crispy_field}}
+                        {% endif %}
+                    {% endfor %}
+                    <button type="submit" class="btn btn-light w-100">Надіслати</button>
+                </form>
+            </div>
+            <div class="mx-auto w-full p-3 mt-4">
+                <h4 class="text-center">Наші соцмережі</h4>
+                <div class="d-flex justify-content-between">
                     <div class="links-on-social">
-                        <a href="https://www.instagram.com/vishitiy.ua?igsh=MXZ4ejM5eDR5MWgwMQ==" target="_blank"> <img src="{% static 'img/instagram.svg' %}" > </a>
+                        <a href="https://www.instagram.com/vishitiy.ua?igsh=MXZ4ejM5eDR5MWgwMQ==" target="_blank"> <img src="{% static 'img/instagram.svg' %}" width="200" height="200" > </a>
                     </div>
     
                     <div class="links-on-social">
-                        <a href="https://www.facebook.com/profile.php?id=100090697746664" target="_blank"> <img src="{% static 'img/facebook.svg' %}" > </a>
+                        <a href="https://www.facebook.com/profile.php?id=100090697746664" target="_blank"> <img src="{% static 'img/facebook.svg' %}" width="200" height="200" > </a>
                     </div>
     
                     <div class="links-on-social">
-                        <a href="https://www.tiktok.com/@vishitiy.ua?_t=8n8Qs4st9oU&_r=1" target="_blank"> <img src="{% static 'img/tiktok.svg' %}" > </a>
+                        <a href="https://www.tiktok.com/@vishitiy.ua?_t=8n8Qs4st9oU&_r=1" target="_blank"> <img src="{% static 'img/tiktok.svg' %}" width="200" height="200" > </a>
                     </div>
                 </div>
             </div>
