@@ -8,6 +8,7 @@ np = NovaPoshta()
 from django import forms
 from django_countries.fields import CountryField
 
+
 class PaymentForm(forms.Form):
     email = forms.EmailField(label="Email")  # поле для ввода email
     name = forms.CharField(label="Ім`я")  # поле для ввода имени
@@ -16,7 +17,6 @@ class PaymentForm(forms.Form):
     post = forms.CharField(label="Поштовий індекс")  # Поле для ввода почтового индекса
     city = forms.CharField(
         label="Назва або Індекс населеного пункту",
-        
     )
     post_office = forms.CharField(
         label="Відділення Нової пошти",
@@ -31,12 +31,13 @@ class PaymentForm(forms.Form):
             "hx-indicator": "#indicator",
         }
 
-
     def __init__(self, *args, **kwargs):
         # Вызывает конструктор родительского класса (forms.Form).
         super().__init__(*args, **kwargs)
         # проходится (переьирает) все поля формы
-        self.fields["city"].widget.attrs.update(self.get_autocomplete_field_attrs("payments:get-cities"))
+        self.fields["city"].widget.attrs.update(
+            self.get_autocomplete_field_attrs("payments:get-cities")
+        )
         self.fields["post_office"].widget.attrs.update(
             {
                 **self.get_autocomplete_field_attrs("payments:get-post-offices"),
@@ -48,7 +49,6 @@ class PaymentForm(forms.Form):
             self.fields[field].widget.attrs.update(
                 {"class": "border border-light text-white bg-black form-control"}
             )
-
 
     # def clean_post_office(self):
     #     post_office_description = self.cleaned_data["post_office"]

@@ -17,7 +17,9 @@ from main import forms
 @require_http_methods(["GET"])
 def index_view(request: http.HttpRequest) -> http.HttpResponse:
     discounted_products = Product.objects.filter(discount__gte=20)
-    grouped_discounted_products = zip_longest(*[iter(discounted_products)] * 4, fillvalue=None)
+    grouped_discounted_products = zip_longest(
+        *[iter(discounted_products)] * 4, fillvalue=None
+    )
     context = {
         "collections": Collection.objects.all(),
         "grouped_products": grouped_discounted_products,
@@ -27,10 +29,12 @@ def index_view(request: http.HttpRequest) -> http.HttpResponse:
 
 @require_http_methods(["GET"])
 def get_algolia_credentials_view(request: http.HttpRequest) -> http.JsonResponse:
-    return http.JsonResponse({
-        "APP_ID": os.getenv("ALGOLIA_APP_ID"),
-        "API_KEY": os.getenv("ALGOLIA_API_KEY"),
-    })
+    return http.JsonResponse(
+        {
+            "APP_ID": os.getenv("ALGOLIA_APP_ID"),
+            "API_KEY": os.getenv("ALGOLIA_API_KEY"),
+        }
+    )
 
 
 @require_http_methods(["GET"])

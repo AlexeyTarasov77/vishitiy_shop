@@ -1,7 +1,9 @@
-from django import forms 
+from django import forms
+
 # Импортируем модуль фоорм джанго
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 # Иммпортируем стандартные формы аутентификации и создания пользователя из джанго
+
 
 # создание кастомной формы аунтефикации наследующуюся от стандартных форм Джанго
 class CustomAuthenticationForm(AuthenticationForm):
@@ -9,9 +11,10 @@ class CustomAuthenticationForm(AuthenticationForm):
         # Вызов родительского конструктора что бы инициализировать форму
         super().__init__(*args, **kwargs)
         # Если в данных формы ('self.data') есть поле password
-        if 'password' in self.data:
+        if "password" in self.data:
             # Устанавливаем атрибут value виджета поля password равным значению из данных формы
-            self.fields['password'].widget.attrs['value'] = self.data['password']
+            self.fields["password"].widget.attrs["value"] = self.data["password"]
+
 
 # создаём кастомную форму создания пользователя наследующуюся от стандартной формы создания пользователя Джанго
 class CustomUserCreationForm(UserCreationForm):
@@ -19,10 +22,10 @@ class CustomUserCreationForm(UserCreationForm):
         # Вызов родительского конструктора что бы инициализировать форму
         super().__init__(*args, **kwargs)
         # Если в данных формы ('self.data') есть поле password1
-        if 'password1' in self.data:
+        if "password1" in self.data:
             # Устанавливаем атрибут 'value' виджета поля 'password1' равным значению из данных формы
-            self.fields['password1'].widget.attrs['value'] = self.data['password1']
+            self.fields["password1"].widget.attrs["value"] = self.data["password1"]
         # Если в данных формы ('self.data') есть поле password2
-        if 'password2' in self.data:
+        if "password2" in self.data:
             # Устанавливаем атрибут value виджета поля password2 равным значению из данных формы
-            self.fields['password2'].widget.attrs['value'] = self.data['password2']
+            self.fields["password2"].widget.attrs["value"] = self.data["password2"]

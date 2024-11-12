@@ -1,4 +1,3 @@
-
 from django.contrib import (
     admin,
 )  # Импортируем модуль admin из Django для регистрации моделей в админ-панели
@@ -6,11 +5,8 @@ from .widgets import SerializedCheckboxSelectMultipleWidget
 from .models import Collection, Product  # Импортируем модели Collection и Product
 
 
-
 # Регистрируем модель Collection в админ-панели
 admin.site.register(Collection)
-
-
 
 
 # Регистрируем модель Product с использованием кастомного класса ProductAdmin
@@ -24,23 +20,21 @@ class ProductAdmin(admin.ModelAdmin):
         # Получаем базовую форму для модели Product
         form = super().get_form(request, obj, **kwargs)
 
-
         # Кастомизируем виджет для поля available_sizes
-        form.base_fields["available_sizes"].widget = (
-            SerializedCheckboxSelectMultipleWidget(
-                choices=Product.SIZE_CHOICES,  # Устанавливаем возможные варианты выбора размеров
-                attrs={"class": "form-control"},  # Добавляем CSS-класс для оформления
-            )
+        form.base_fields[
+            "available_sizes"
+        ].widget = SerializedCheckboxSelectMultipleWidget(
+            choices=Product.SIZE_CHOICES,  # Устанавливаем возможные варианты выбора размеров
+            attrs={"class": "form-control"},  # Добавляем CSS-класс для оформления
         )
 
         # Кастомизируем виджет для поля available_colors
-        form.base_fields["available_colors"].widget = (
-            SerializedCheckboxSelectMultipleWidget(
-                choices=Product.COLOR_PALETTE,  # Устанавливаем возможные варианты выбора цветов
-                attrs={"class": "form-control"},  # Добавляем CSS-класс для оформления
-            )
+        form.base_fields[
+            "available_colors"
+        ].widget = SerializedCheckboxSelectMultipleWidget(
+            choices=Product.COLOR_PALETTE,  # Устанавливаем возможные варианты выбора цветов
+            attrs={"class": "form-control"},  # Добавляем CSS-класс для оформления
         )
 
         # Возвращаем кастомизированную форму
         return form
-

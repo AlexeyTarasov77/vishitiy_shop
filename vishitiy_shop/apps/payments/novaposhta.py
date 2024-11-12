@@ -17,20 +17,19 @@ class NovaPoshta:
                 "apiKey": self.api_key,
                 "modelName": model_name,
                 "calledMethod": method,
-                "methodProperties": params
+                "methodProperties": params,
             },
             headers={"Content-Type": "application/json"},
         )
 
-
-        print('got response', resp)
+        print("got response", resp)
 
         return resp.json()
 
     def get_cities(self, **params):
         print("Getting cities")
         return self.send("Address", "getCities", **params)
-    
+
     def search_cities(self, **params):
         print("searching cities with params", params)
         return self.send("AddressGeneral", "searchSettlements", **params)

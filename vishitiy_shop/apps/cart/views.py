@@ -34,9 +34,13 @@ class CartMixin(FormMixin, generic.View):
         form = self.get_form()  # Получаем экземпляр формы
         form.process_request(request)  # Обрабатываем запрос формой
         if form.is_valid():  # Проверяем валидность данных формы
-            return self.form_valid(form)  # Если данные формы валидны, вызываем метод form_valid
+            return self.form_valid(
+                form
+            )  # Если данные формы валидны, вызываем метод form_valid
         else:
-            return self.form_invalid(form)  # Если данные формы невалидны, вызываем метод form_invalid
+            return self.form_invalid(
+                form
+            )  # Если данные формы невалидны, вызываем метод form_invalid
 
     def form_valid(self, form: Any) -> HttpResponse:
         saved_data = form.save() or {}
@@ -46,7 +50,6 @@ class CartMixin(FormMixin, generic.View):
         )
 
     def form_invalid(self, form: Any) -> HttpResponse:
-
         # Метод вызывается при ошибке валидации формы.
 
         return JsonResponse(
@@ -55,20 +58,17 @@ class CartMixin(FormMixin, generic.View):
 
 
 class CartAddView(CartMixin):
-
     # Представление для добавления товара в корзину.
 
     form_class = forms.CartAddForm  # Указываем класс формы для добавления товара
     msg = "Товар додано до кошика"  # Сообщение об успешном добавлении товара
 
     def form_valid(self, form: forms.CartAddForm) -> HttpResponse:
-        product_id = form.cleaned_data['product_id']
-        serialized_product = serialize(
-            "json", [Product.objects.get(id=product_id)]
-        )
+        product_id = form.cleaned_data["product_id"]
+        serialized_product = serialize("json", [Product.objects.get(id=product_id)])
         response = super().form_valid(form)
         response_data = json.loads(response.content)
-        response_data['data']['product'] = serialized_product
+        response_data["data"]["product"] = serialized_product
         print(response_data)
         response.content = json.dumps(response_data)
         return response
@@ -89,7 +89,6 @@ class CartAddView(CartMixin):
 
 
 class CartUpdateView(CartMixin):
-
     # Представление для обновления количества товара в корзине.
 
     form_class = (
@@ -99,10 +98,8 @@ class CartUpdateView(CartMixin):
 
 
 class CartRemoveView(CartMixin):
-
     # Представление для удаления товара из корзины.
 
     form_class = forms.CartRemoveForm  # Указываем класс формы для удаления товара
 
     status_code = 200  # Код состояния HTTP ответа для успешного удаления товара
-

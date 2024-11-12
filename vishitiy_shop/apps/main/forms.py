@@ -17,5 +17,7 @@ class ContactForm(forms.Form):
             )
         for char in phone_number:
             if not char.isdigit():
-                raise forms.ValidationError("Номер телефону повинен містити тільки цифри.")
+                raise forms.ValidationError(
+                    "Номер телефону повинен містити тільки цифри."
+                )
         return country_code + phone_number

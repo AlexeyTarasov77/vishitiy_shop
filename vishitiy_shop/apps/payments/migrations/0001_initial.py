@@ -4,27 +4,38 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Payment',
+            name="Payment",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order_id', models.CharField(max_length=255)),
-                ('order_desc', models.CharField(max_length=255)),
-                ('currency', models.CharField(default='UAH', max_length=3)),
-                ('amount', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('signature', models.CharField(max_length=255)),
-                ('merchant_id', models.CharField(max_length=255)),
-                ('status', models.CharField(default='created', max_length=255)),
-                ('payment_id', models.CharField(blank=True, max_length=100, null=True, unique=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('update_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("order_id", models.CharField(max_length=255)),
+                ("order_desc", models.CharField(max_length=255)),
+                ("currency", models.CharField(default="UAH", max_length=3)),
+                ("amount", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("signature", models.CharField(max_length=255)),
+                ("merchant_id", models.CharField(max_length=255)),
+                ("status", models.CharField(default="created", max_length=255)),
+                (
+                    "payment_id",
+                    models.CharField(
+                        blank=True, max_length=100, null=True, unique=True
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("update_at", models.DateTimeField(auto_now=True)),
             ],
         ),
     ]

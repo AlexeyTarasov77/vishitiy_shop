@@ -122,5 +122,4 @@ class SignupView(generic.CreateView):
         # Отправляем сообщение об успешной регистрации аккаунта
         return super().form_valid(form)
 
-
     # Вызываем родительский метод form_valid для сохранения данных формы

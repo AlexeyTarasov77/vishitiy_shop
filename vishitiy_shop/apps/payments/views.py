@@ -24,8 +24,12 @@ def get_post_offices_view(request):
     city = request.GET.get("city")
     post_offices = []
     if post_office and city:
-        post_offices = np.get_post_offices(CityName=city, FindByString=post_office)["data"][:10]
-    return render(request, "payments/partials/post_offices.html", {"post_offices": post_offices})
+        post_offices = np.get_post_offices(CityName=city, FindByString=post_office)[
+            "data"
+        ][:10]
+    return render(
+        request, "payments/partials/post_offices.html", {"post_offices": post_offices}
+    )
 
 
 def get_cities_view(request):
@@ -42,36 +46,49 @@ def get_cities_view(request):
 def payment_view(request):
     if request.method == "POST":
         print("INTO POST")
-        form = forms.PaymentForm(request.POST)  # Создаем форму PaymentForm из POST-запроса
+        form = forms.PaymentForm(
+            request.POST
+        )  # Создаем форму PaymentForm из POST-запроса
         cart = Cart(request)  # Создаем объект корзины
         if not cart:
             return HttpResponse("Корзина пуста", status=400)
         basket_order = []
         for item in cart:
-            basket_order.append({
-                "name": item["product"].title,
-                "qty": item["quantity"],
-                "sum": int(item["total_price"] * 100),
-                "icon": request.build_absolute_uri(item["product"].image.url),
-                "unit": "шт.",
-                "code": item["product"].slug,
-                "barcode": "string",
-                "header": "string",
-                "footer": "string",
-                "tax": [],
-            })
+            basket_order.append(
+                {
+                    "name": item["product"].title,
+                    "qty": item["quantity"],
+                    "sum": int(item["total_price"] * 100),
+                    "icon": request.build_absolute_uri(item["product"].image.url),
+                    "unit": "шт.",
+                    "code": item["product"].slug,
+                    "barcode": "string",
+                    "header": "string",
+                    "footer": "string",
+                    "tax": [],
+                }
+            )
         data = {
             "amount": int(cart.get_total() * 100),
             "merchantPaymInfo": {
                 "destination": "Оплата замовлення",
                 "basketOrder": basket_order,
             },
-            "redirectUrl": request.build_absolute_uri(reverse("payments:payment-status")),
-            "webHookUrl": request.build_absolute_uri(reverse("payments:monobank-webhook")),
+            "redirectUrl": request.build_absolute_uri(
+                reverse("payments:payment-status")
+            ),
+            "webHookUrl": request.build_absolute_uri(
+                reverse("payments:monobank-webhook")
+            ),
         }
-        headers = {"X-Token": settings.MONOBANK_API_TOKEN, "Content-Type": "application/json"}
+        headers = {
+            "X-Token": settings.MONOBANK_API_TOKEN,
+            "Content-Type": "application/json",
+        }
         resp = requests.post(
-            "https://api.monobank.ua/api/merchant/invoice/create", json=data, headers=headers
+            "https://api.monobank.ua/api/merchant/invoice/create",
+            json=data,
+            headers=headers,
         )
         if resp.status_code == 200:
             if form.is_valid():  # Проверяем валидность формы
@@ -105,10 +122,12 @@ def payment_view(request):
                 return redirect(resp.json()["pageUrl"])
             print(form.errors)
             return render(request, "payments/email_form.html", {"form": form})
-        
+
         return JsonResponse(resp.json(), status=resp.status_code)
 
-    form = forms.PaymentForm()  # Если метод запроса GET создаем пустую форму PaymentForm
+    form = (
+        forms.PaymentForm()
+    )  # Если метод запроса GET создаем пустую форму PaymentForm
     return render(
         request,
         "payments/email_form.html",
@@ -118,7 +137,7 @@ def payment_view(request):
 
 @csrf_exempt
 def monobank_webhook(request):
-    print('WEBHOOOOOK')
+    print("WEBHOOOOOK")
     payload = json.loads(request.body)
     print("WEBHOOK PAYLOAD: ", payload)
     if payload.get("status") == "success":

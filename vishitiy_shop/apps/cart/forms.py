@@ -15,7 +15,6 @@ class CartBaseForm(forms.Form):
     которому передаются отвалидированные данные.
     """
 
-
     def process_request(self, request):
         # Метод для обработки запроса. Устанавливает атрибут request.
         print("CALLING METHOD", request)
@@ -33,7 +32,6 @@ class CartAddForm(CartBaseForm):
     Содержит дополнительную валидацию того, что добавляемый продукт еще не добавлялся в корзину.
     """
 
-
     product_id = forms.CharField(widget=forms.HiddenInput)
     quantity = forms.IntegerField(initial=1, min_value=1, required=False)
     size = forms.CharField(
@@ -45,9 +43,7 @@ class CartAddForm(CartBaseForm):
     def clean(self):
         # Метод очистки данных формы проверяет, что продукт еще не добавлен в корзину.
 
-
         if getattr(self, "request", None):
-
             cart = Cart(self.request)
             if self.cleaned_data["product_id"] in cart:
                 raise forms.ValidationError("Продукт вже знаходиться в корзині")
@@ -81,8 +77,6 @@ class CartRemoveForm(CartBaseForm):
     """Форма удаления продукта из корзины."""
 
     product_id = forms.CharField(widget=forms.HiddenInput)
-
-
 
     def save(self):
         # Переопределенный метод сохранения. Удаляет продукт из корзины.

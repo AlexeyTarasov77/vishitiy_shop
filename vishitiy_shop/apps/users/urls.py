@@ -1,5 +1,3 @@
-
-
 from django.urls import path
 
 # Импортируем функцию path для создания маршрутов URL
@@ -22,4 +20,3 @@ urlpatterns = [
     path("logout/", views.LogoutView.as_view(), name="logout"),
     # URL для выхода из аккаунта, использует кастомное представление LogoutView
 ]
-
