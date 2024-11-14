@@ -1,10 +1,7 @@
-from .cart import Cart  # Импорт класса Cart для работы с корзиной
 from django import forms  # Импорт модуля форм Django
-
-from products.validators import (
-    ProductSizeValidator,
-)  # Импорт валидатора размеров продуктов
 from products.models import Product  # Импорт модели Product
+
+from .cart import Cart  # Импорт класса Cart для работы с корзиной
 
 
 class CartBaseForm(forms.Form):
@@ -34,10 +31,8 @@ class CartAddForm(CartBaseForm):
 
     product_id = forms.CharField(widget=forms.HiddenInput)
     quantity = forms.IntegerField(initial=1, min_value=1, required=False)
-    size = forms.CharField(
-        validators=[ProductSizeValidator(Product.ACCEPTABLE_SIZES).validate_size]
-    )
-    color = forms.CharField()
+    size = forms.ChoiceField(choices=Product.SIZE_CHOICES)
+    color = forms.ChoiceField(choices=Product.COLOR_CHOICES)
     price = forms.DecimalField()
 
     def clean(self):

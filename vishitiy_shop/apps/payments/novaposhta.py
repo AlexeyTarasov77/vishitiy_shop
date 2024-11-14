@@ -1,6 +1,7 @@
-from django.conf import settings
-import requests
 from functools import lru_cache
+
+import requests
+from django.conf import settings
 
 
 class NovaPoshta:
@@ -10,7 +11,6 @@ class NovaPoshta:
 
     @lru_cache(maxsize=32)
     def send(self, model_name: str, method: str, **params):
-        print("Sending", model_name, method, params)
         resp = requests.post(
             self.api_url,
             json={
@@ -22,22 +22,16 @@ class NovaPoshta:
             headers={"Content-Type": "application/json"},
         )
 
-        print("got response", resp)
-
         return resp.json()
 
     def get_cities(self, **params):
-        print("Getting cities")
         return self.send("Address", "getCities", **params)
 
     def search_cities(self, **params):
-        print("searching cities with params", params)
-        return self.send("AddressGeneral", "searchSettlements", **params)
-
-    def search_cities(self, **params):
-        print("searching cities with params", params)
         return self.send("AddressGeneral", "searchSettlements", **params)
 
     def get_post_offices(self, **params):
-        print("Getting post offices")
         return self.send("AddressGeneral", "getWarehouses", **params)
+
+
+nova_poshta = NovaPoshta()

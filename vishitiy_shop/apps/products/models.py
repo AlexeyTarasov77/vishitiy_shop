@@ -1,41 +1,32 @@
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.urls import reverse
 from main.mixins import SaveSlugMixin
 
-from products.validators import ProductSizeValidator
-
 
 class Product(SaveSlugMixin, models.Model):
     slugify_field_name = "title"
 
-    ACCEPTABLE_SIZES = ["XS", "S", "M", "L", "XL", "XXL"]
-    SIZE_CHOICES = tuple((size, size) for size in ACCEPTABLE_SIZES)
-    COLOR_PALETTE = tuple(
-        (color, color) for color in ("white", "black", "red", "green", "blue", "yellow")
-    )
-    PRODUCT_TYPE_CHOICES = tuple(
-        (type, type)
-        for type in (
-            "shoes",
-            "t-shirt",
-            "sweatshirt",
-            "pants",
-            "jacket",
-            "sunglasses",
-        )  # Варианты типов продуктов
-    )
-
-    SIZE_VALIDATOR = ProductSizeValidator(ACCEPTABLE_SIZES)
+    VALID_SIZES = ("XS", "S", "M", "L", "XL", "XXL")
+    SIZE_CHOICES = tuple((size, size) for size in VALID_SIZES)
+    VALID_COLORS = ("white", "black", "red", "green", "blue", "yellow")
+    COLOR_CHOICES = tuple((color, color) for color in VALID_COLORS)
+    VALID_CATEGORIES = ("shoes", "t-shirt", "sweatshirt", "pants", "jacket", "sunglasses")
+    CATEGORY_CHOICES = tuple((cat, cat) for cat in VALID_CATEGORIES)
 
     title = models.CharField(max_length=150)
     slug = models.SlugField(unique=True, blank=True)
-    available_colors = models.JSONField(default=list)
-    available_sizes = models.JSONField(default=list, validators=[SIZE_VALIDATOR.validate_size])
+    available_colors = ArrayField(
+        models.TextField(choices=COLOR_CHOICES), default=list, size=len(COLOR_CHOICES)
+    )
+    available_sizes = ArrayField(
+        models.TextField(choices=SIZE_CHOICES), default=list, size=len(SIZE_CHOICES)
+    )
     available = models.BooleanField(default=True)
-    type = models.CharField(choices=PRODUCT_TYPE_CHOICES, max_length=50)
+    category = models.CharField(choices=CATEGORY_CHOICES, max_length=50)
     image = models.ImageField()
-    description = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, default="")
     # TODO: использовать поле составного типа, для хранения валюты
     price = models.DecimalField(max_digits=10, decimal_places=2)
     # Discount in % from 0 to 100
@@ -52,7 +43,7 @@ class Product(SaveSlugMixin, models.Model):
     def __str__(self) -> str:
         return self.title
 
-    def get_absolute_url(self):
+    def get_absolute_url(self) -> str:
         return reverse("products:detail", kwargs={"slug": self.slug})
 
     @property

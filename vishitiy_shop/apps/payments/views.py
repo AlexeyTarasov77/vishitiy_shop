@@ -9,36 +9,28 @@ from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.html import strip_tags
-from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
-from payments.novaposhta import NovaPoshta
+from payments.novaposhta import nova_poshta
 
 from . import forms
 
 
-def get_post_offices_view(request):
-    np = NovaPoshta()
-    print(request.GET)
+def get_post_offices_view(request) -> HttpResponse:
     post_office = request.GET.get("post_office")
     city = request.GET.get("city")
     post_offices = []
     if post_office and city:
-        post_offices = np.get_post_offices(CityName=city, FindByString=post_office)[
-            "data"
-        ][:10]
-    return render(
-        request, "payments/partials/post_offices.html", {"post_offices": post_offices}
-    )
+        post_offices = nova_poshta.get_post_offices(CityName=city, FindByString=post_office)["data"][:10]
+    return render(request, "payments/partials/post_offices.html", {"post_offices": post_offices})
 
 
-def get_cities_view(request):
-    np = NovaPoshta()
-    print(request.GET)
+def get_cities_view(request) -> HttpResponse:
     city = request.GET.get("city")
     cities = []
     if city:
-        cities = np.search_cities(CityName=city)["data"][0]["Addresses"]
+        cities = nova_poshta.search_cities(CityName=city)["data"][0]["Addresses"]
     print(cities)
     return render(request, "payments/partials/cities.html", {"cities": cities})
 
@@ -46,40 +38,32 @@ def get_cities_view(request):
 def payment_view(request):
     if request.method == "POST":
         print("INTO POST")
-        form = forms.PaymentForm(
-            request.POST
-        )  # Создаем форму PaymentForm из POST-запроса
+        form = forms.PaymentForm(request.POST)  # Создаем форму PaymentForm из POST-запроса
         cart = Cart(request)  # Создаем объект корзины
         if not cart:
             return HttpResponse("Корзина пуста", status=400)
         basket_order = []
         for item in cart:
-            basket_order.append(
-                {
-                    "name": item["product"].title,
-                    "qty": item["quantity"],
-                    "sum": int(item["total_price"] * 100),
-                    "icon": request.build_absolute_uri(item["product"].image.url),
-                    "unit": "шт.",
-                    "code": item["product"].slug,
-                    "barcode": "string",
-                    "header": "string",
-                    "footer": "string",
-                    "tax": [],
-                }
-            )
+            basket_order.append({
+                "name": item["product"].title,
+                "qty": item["quantity"],
+                "sum": int(item["total_price"] * 100),
+                "icon": request.build_absolute_uri(item["product"].image.url),
+                "unit": "шт.",
+                "code": item["product"].slug,
+                "barcode": "string",
+                "header": "string",
+                "footer": "string",
+                "tax": [],
+            })
         data = {
             "amount": int(cart.get_total() * 100),
             "merchantPaymInfo": {
                 "destination": "Оплата замовлення",
                 "basketOrder": basket_order,
             },
-            "redirectUrl": request.build_absolute_uri(
-                reverse("payments:payment-status")
-            ),
-            "webHookUrl": request.build_absolute_uri(
-                reverse("payments:monobank-webhook")
-            ),
+            "redirectUrl": request.build_absolute_uri(reverse("payments:payment-status")),
+            "webHookUrl": request.build_absolute_uri(reverse("payments:monobank-webhook")),
         }
         headers = {
             "X-Token": settings.MONOBANK_API_TOKEN,
@@ -125,9 +109,7 @@ def payment_view(request):
 
         return JsonResponse(resp.json(), status=resp.status_code)
 
-    form = (
-        forms.PaymentForm()
-    )  # Если метод запроса GET создаем пустую форму PaymentForm
+    form = forms.PaymentForm()  # Если метод запроса GET создаем пустую форму PaymentForm
     return render(
         request,
         "payments/email_form.html",

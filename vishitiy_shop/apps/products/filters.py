@@ -1,9 +1,9 @@
 import django_filters  # Импортируем библиотеку django_filters для создания фильтров
 import django_filters.widgets  # Импортируем виджеты из библиотеки django_filters
 from django import forms  # Импортируем формы из Django
+
+from .models import Collection, Product  # Импортируем модели Product и Collection
 from .widgets import CustomRangeWidget  # Импортируем кастомный виджет для диапазона цен
-from .models import Product, Collection  # Импортируем модели Product и Collection
-from django.urls import reverse
 
 
 # Определяем класс фильтра для модели Product
@@ -35,7 +35,7 @@ class ProductFilter(django_filters.FilterSet):
     # Фильтр для цвета с использованием виджета множественного выбора с чекбоксами
     color = django_filters.TypedMultipleChoiceFilter(
         field_name="available_colors",  # Поле модели, по которому будет фильтрация
-        choices=Product.COLOR_PALETTE,  # Доступные варианты цветов
+        choices=Product.COLOR_CHOICES,  # Доступные варианты цветов
         widget=forms.CheckboxSelectMultiple,  # Виджет для отображения вариантов в виде чекбоксов
         lookup_expr="icontains",  # Метод поиска (независимый от регистра поиск в строках)
         label="Колір",  # Метка для фильтра
@@ -49,27 +49,18 @@ class ProductFilter(django_filters.FilterSet):
         method="filter_discounted_only",  # Метод фильтрации
     )
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     for _, field in self.filters.items():
-    #         field.field.widget.attrs.update({'hx-get': reverse('products:list'), 'hx-target': '.cards'})
-
-    # Метод фильтрации, который возвращает только товары со скидкой, если чекбокс выбран
     def filter_discounted_only(self, queryset, name, value):
         if value:  # Если чекбокс выбран
-            return queryset.filter(
-                discount__gt=0
-            )  # Возвращаем товары с ненулевой скидкой
+            return queryset.filter(discount__gt=0)  # Возвращаем товары с ненулевой скидкой
         return queryset  # Иначе возвращаем все товары
 
-    # Мета-класс для указания модели и полей, которые будут использоваться для фильтрации
     class Meta:
-        model = Product  # Указываем модель, для которой создается фильтр
+        model = Product
         fields = [
             "price",
             "discounted_only",
-            "type",
+            "category",
             "size",
             "color",
             "collection",
-        ]  # Поля модели, которые будут использоваться для фильтрации
+        ]

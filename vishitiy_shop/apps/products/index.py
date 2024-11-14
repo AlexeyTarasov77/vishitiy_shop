@@ -11,7 +11,7 @@ from .models import Product
 # Регистрируем модель Product для индексации в Algolia
 class ProductIndex(AlgoliaIndex):
     # Определяем класс ProductIndex, который наследует от AlgoliaIndex
-    fields = ("title", "type", "url", "image_url", "price")
+    fields = ("title", "category", "url", "image_url", "price")
     # Поля модели Product, которые будут индексироваться в Algolia
     index_name = "products"
     # Имя индекса в Algolia
@@ -22,6 +22,6 @@ class ProductIndex(AlgoliaIndex):
         "attributesForFaceting": [
             "color",
             "size",
-            "type",
+            "category",
         ],  # Поля, которые будут использоваться для фильтрации
     }

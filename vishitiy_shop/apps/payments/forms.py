@@ -1,12 +1,5 @@
-from django import forms  # Импортируем forms из Django для создания форм
-from django.urls import reverse
-from .novaposhta import NovaPoshta
-
-np = NovaPoshta()
-
-
 from django import forms
-from django_countries.fields import CountryField
+from django.urls import reverse
 
 
 class PaymentForm(forms.Form):
@@ -22,7 +15,7 @@ class PaymentForm(forms.Form):
         label="Відділення Нової пошти",
     )
 
-    def get_autocomplete_field_attrs(self, url_name):
+    def _get_autocomplete_field_attrs(self, url_name: str) -> dict[str, str]:
         return {
             "hx-get": reverse(url_name),
             "hx-trigger": "input changed delay:500ms, search",
@@ -32,30 +25,15 @@ class PaymentForm(forms.Form):
         }
 
     def __init__(self, *args, **kwargs):
-        # Вызывает конструктор родительского класса (forms.Form).
         super().__init__(*args, **kwargs)
-        # проходится (переьирает) все поля формы
         self.fields["city"].widget.attrs.update(
-            self.get_autocomplete_field_attrs("payments:get-cities")
+            self._get_autocomplete_field_attrs("payments:get-cities")
         )
-        self.fields["post_office"].widget.attrs.update(
-            {
-                **self.get_autocomplete_field_attrs("payments:get-post-offices"),
-                "hx-include": "#div_id_city input",
-            }
-        )
+        self.fields["post_office"].widget.attrs.update({
+            **self._get_autocomplete_field_attrs("payments:get-post-offices"),
+            "hx-include": "#div_id_city input",
+        })
         for field in self.fields:
-            # Обновляет атрибуты виджета каждого поля формы
-            self.fields[field].widget.attrs.update(
-                {"class": "border border-light text-white bg-black form-control"}
-            )
-
-    # def clean_post_office(self):
-    #     post_office_description = self.cleaned_data["post_office"]
-    #     post_office = np.get_post_offices(Description=post_office_description)["data"]
-    #     print(post_office)
-    #     if not post_office:
-    #         raise forms.ValidationError("Виберіть відділення Нової пошти")
-    #     elif post_office == []:
-    #         raise forms.ValidationError("Такого відділення Нової пошти не існує")
-    #     return post_office
+            self.fields[field].widget.attrs.update({
+                "class": "border border-light text-white bg-black form-control"
+            })

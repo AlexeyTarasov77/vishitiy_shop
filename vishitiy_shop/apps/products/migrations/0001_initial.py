@@ -3,7 +3,6 @@
 import django.core.validators
 import django.db.models.deletion
 import main.mixins
-import products.validators
 from django.db import migrations, models
 
 
@@ -51,9 +50,6 @@ class Migration(migrations.Migration):
                     "available_sizes",
                     models.JSONField(
                         default=list,
-                        validators=[
-                            products.validators.ProductSizeValidator.validate_size
-                        ],
                     ),
                 ),
                 ("available", models.BooleanField(default=True)),

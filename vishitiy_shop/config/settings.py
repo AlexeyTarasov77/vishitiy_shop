@@ -84,23 +84,26 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
-}
-
 # DATABASES = {
 #     "default": {
-#         "ENGINE": "django.db.backends.mysql",
-#         "NAME": "db",
-#         "USER": "root",
-#         "PASSWORD": "mysql12345678rR",
-#         "HOST": "localhost",
-#         "PORT": "3306",
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": BASE_DIR / "db.sqlite3",
 #     }
 # }
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
+        "OPTIONS": {
+            "pool": True,
+        },
+    }
+}
 
 
 # Password validation
@@ -165,7 +168,7 @@ LOGOUT_REDIRECT_URL = "users:login"
 ALGOLIA = {
     "APPLICATION_ID": str(os.getenv("ALGOLIA_APP_ID")),
     "API_KEY": str(os.getenv("ALGOLIA_API_KEY")),
-    "INDEX_PREFIX": str(os.getenv("ALGOLIA_INDEX_PREFIX")),
+    "INDEX_PREFIX": "vishitiy_shop",
 }
 
 
