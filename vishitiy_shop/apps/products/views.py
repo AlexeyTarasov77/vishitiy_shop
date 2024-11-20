@@ -1,45 +1,81 @@
 from typing import Any
-from django.shortcuts import render
-from django.views import generic
-from .models import Product
+
+from django import http
+from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.db.models import QuerySet
-from .filters import ProductFilter
+from django.template.loader import render_to_string
+from django.urls import reverse_lazy
+from django.utils.html import strip_tags
+from django.views import generic
+from django.utils.translation import gettext as _
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
+from products import filters, forms, models
 
 
-# Create your views here.
 class ProductListView(generic.ListView):
-    # Здесь мы указываем шаблон который будет использоваться для отображения списка продуктов
     template_name = "products/product_list.html"
-    # Задаем queryset, который извлекает все объекты Product и использует select_related для оптимизации запросов
-    queryset = Product.objects.all().select_related("collection")
+    queryset = models.Product.objects.all().select_related("collection")
 
     def get_template_names(self) -> list[str]:
-        if self.request.headers.get("Hx-Request") == "true":  # если запрос Ajax
-            print("ajax")
+        if self.request.headers.get("Hx-Request") == "true":  # if request is ajax
+            print("is ajax")
             return ["products/includes/product_list_p.html"]
         return super().get_template_names()
 
-    # метод для получения queryset
-    def get_queryset(self) -> QuerySet[Product]:
-        # вызываем get_queryset из родительского класса для получения базового queryset
+    def get_queryset(self) -> QuerySet[models.Product]:
         qs = super().get_queryset()
-        # Создаем экземпляр фильтра, передавая GET параметры запроса и базовый queryset
-        self.filterset = ProductFilter(self.request.GET, queryset=qs)
-        # Возвращаем отфильтрованный queryset
+        self.filterset = filters.ProductFilter(self.request.GET, queryset=qs)
         return self.filterset.qs
 
-    # Метод для получения контекста данных которые будут переданы в шаблон
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
-        # Получаем базовый контекст из родительского класса
         context = super().get_context_data(**kwargs)
-        # Добавляем форму фильтра в контекст
         context["form"] = self.filterset.form
-        # Возвращаем контекст
         return context
 
 
 class ProductDetailView(generic.DetailView):
-    # Задаем queryset, который извлекает все объекты Product и использует select_related для оптимизации запросов
-    queryset = Product.objects.all().select_related("collection")
-    # Указываем шаблон, который будет использоваться для отображения деталей продукта
+    queryset = models.Product.objects.all().select_related("collection")
     template_name = "products/product_detail.html"
+
+
+class CustomDesignView(LoginRequiredMixin, generic.FormView):
+    form_class = forms.CustomDesignForm
+    template_name = "products/custom_design.html"
+    success_url = reverse_lazy("main:index")
+
+    def form_valid(self, form: forms.CustomDesignForm) -> http.HttpResponse:
+        data = form.cleaned_data
+        user = self.request.user
+        context = {**data, "user": user}
+        print(context)
+        email_html_content = render_to_string("products/email_custom_design.html", context)
+        email_plain_content = strip_tags(email_html_content)
+        mail = EmailMultiAlternatives(
+            f"{user.username}'s Customized Design",
+            email_plain_content,
+            from_email=user.email,
+            to=[settings.ADMIN_EMAIL],
+        )
+        mail.attach_alternative(email_html_content, "text/html")
+        design_image: InMemoryUploadedFile | None = data.get("design_image")
+        if design_image:
+            with design_image.open("rb") as f:
+                mail.attach(_("design_image"), f.read(), f.content_type)
+                print("FILE ATTACHED")
+        mail.send()
+        # send_mail(
+        #     f"{user.username}'s Customized Design",
+        #     email_plain_content,
+        #     from_email=user.email,
+        #     recipient_list=[settings.ADMIN_EMAIL],
+        #     html_message=email_html_content,
+        # )
+        messages.success(
+            self.request,
+            "Ви залишили заявку на створення дизайну. Менеджер зв'яжеться з вами через деякий час",
+        )
+        return super().form_valid(form)

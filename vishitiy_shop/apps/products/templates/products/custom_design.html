@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    .asteriskField {
+        color: red;
+    }
+</style>
+<div class="container d-flex justify-content-center align-items-center p-5 text-slate-100">
+    <div class="d-flex flex-column justify-content-center align-items-center p-2 border-x">
+        <h3>Замовте особистий дизайн</h3>
+        <p>
+            Заповніть форму, щоб замовити особистий дизайн вашого вишивки.
+            Пiсля замовлення з вами зв'яжеться продавець
+        </p>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="flex justify-center">
+                <button type="submit" class="btn btn-outline-light">Замовити дизайн</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

@@ -23,6 +23,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
+
+ADMINS = [("alexey", ADMIN_EMAIL)]
 
 # Application definition
 
@@ -44,7 +48,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = ["main", "users", "products", "your_design", "cart", "payments"]
+LOCAL_APPS = ["main", "users", "products", "cart", "payments"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -79,7 +83,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -143,7 +146,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = Path(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

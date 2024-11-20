@@ -8,7 +8,6 @@ urlpatterns = [
     path("", include("main.urls", namespace="main")),
     path("accounts/", include("users.urls", namespace="users")),
     path("products/", include("products.urls", namespace="products")),
-    path("your_design/", include("your_design.urls", namespace="your_design")),
     path("email_form/", include("payments.urls", namespace="email_form")),
     path("cart/", include("cart.urls", namespace="cart")),
     path("payments/", include("payments.urls", namespace="payments")),
