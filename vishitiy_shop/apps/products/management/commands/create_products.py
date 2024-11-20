@@ -1,6 +1,7 @@
-import os
 import random
+from pathlib import Path
 
+from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from faker import Faker
 from products.models import Collection, Product
@@ -14,6 +15,10 @@ class Command(BaseCommand):
             "count", type=int, help="Number of collections and products to create", default=10
         )
 
+    def _clear_db(self):
+        Product.objects.all().delete()
+        Collection.objects.all().delete()
+
     def handle(self, *args, **kwargs):
         count = kwargs["count"]
         if count < 1:
@@ -22,12 +27,19 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING("Warning: it can take a while"))
         fake = Faker()
 
-        def get_images(dirname: str) -> list[str]:
-            path = os.path.join(os.path.dirname(__file__), "images", dirname)
-            return os.listdir(path)
+        def get_images_by_dirname(dirname: str) -> list[str]:
+            subdir_path = Path(__file__).parent.relative_to(settings.BASE_DIR / "apps") / dirname
+            images_path: Path = settings.MEDIA_ROOT / subdir_path
+            return [
+                path.relative_to(settings.MEDIA_ROOT).as_posix()
+                for path in images_path.iterdir()
+                if path.is_file()
+            ]
 
-        collection_images = get_images("collections")
-        product_images = get_images("products")
+        collection_images = get_images_by_dirname("collections")
+        product_images = get_images_by_dirname("products")
+        self.stdout.write(self.style.NOTICE("Clearing database"))
+        self._clear_db()
         self.stdout.write(self.style.NOTICE(f"Creating {count} collections and products"))
         for _ in range(count):
             # TODO: Remove hardcoded img names
